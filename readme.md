@@ -85,5 +85,5 @@ When no longer needed, the reverb instance should be freed to avoid memory leaks
 ```c
 destroy_reverb(reverb);
 ```
-This deallocates all internal buffers and structures associated with the `DattoroReverb` instance.
+
 
