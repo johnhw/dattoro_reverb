@@ -71,7 +71,16 @@ void destroy_delay(DelayLine *delay)
 void delay_in(DelayLine *delay, float sample)
 {
     double offset;
-    delay->samples[delay->write_head++] = sample;
+     // feedback, if enabled
+  
+    delay->samples[delay->write_head] = sample;
+
+    if (delay->feedback != 0.0)
+    {
+        delay->samples[delay->write_head] += delay->feedback * delay_out(delay);
+    }
+    
+    delay->write_head++;
 
     if (delay->modulated)
     {
@@ -84,11 +93,7 @@ void delay_in(DelayLine *delay, float sample)
     if (delay->write_head >= delay->n_samples)
         delay->write_head = 0;
 
-    // feedback, if enabled
-    if (delay->feedback != 0.0)
-    {
-        delay->samples[delay->write_head] += delay->feedback * delay_out(delay);
-    }
+   
 }
 
 // set the interpolation mode (linear or allpass)
@@ -125,7 +130,7 @@ float delay_out(DelayLine *delay)
     an = delay->samples[aread];
     bn = delay->samples[bread];
 
-    if (delay->read_fraction == 0.0 || delay->interpolation_mode == MODDELAY_INTERPOLATION_NONE)
+    if (delay->interpolation_mode == MODDELAY_INTERPOLATION_NONE)
         return an;
         
     if (delay->interpolation_mode == MODDELAY_INTERPOLATION_LINEAR)
@@ -260,7 +265,14 @@ DattoroReverb *create_reverb(int sample_rate)
     reverb->diffusion_sample_a = 0;
     reverb->diffusion_sample_b = 0;
     for (int i = 0; i < DELAY_MAX; i++)
-        reverb->delay_lines[i] = create_delay();
+    {
+        reverb->delay_lines[i] = create_delay();        
+        reverb->delay_lines[i]->interpolation_mode = MODDELAY_INTERPOLATION_NONE;
+    }
+
+    reverb->delay_lines[DELAY_672]->interpolation_mode = MODDELAY_INTERPOLATION_ALLPASS;
+    reverb->delay_lines[DELAY_908]->interpolation_mode = MODDELAY_INTERPOLATION_ALLPASS;
+
     set_default_reverb(reverb);
     return reverb;
 }

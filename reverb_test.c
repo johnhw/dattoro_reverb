@@ -151,8 +151,8 @@ int main(int argc, char **argv)
     fprintf(stdout, "Read %d samples at %d Hz\n", nSamples, sampleRate);
     // construct and configure reverb
     DattoroReverb *reverb = create_reverb(sampleRate);
-    set_reverb_param(reverb, REVERB_SIZE, 2);
-    set_reverb_param(reverb, REVERB_WET, -1);
+    set_reverb_param(reverb, REVERB_SIZE, 0.5);
+    set_reverb_param(reverb, REVERB_WET, -6);
     // render reverb
     int reverbSamples = nSamples + 10 * sampleRate;
     float *reverbBuffer = (float *)malloc(reverbSamples * 2 * sizeof(float));
