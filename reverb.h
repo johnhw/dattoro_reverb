@@ -27,12 +27,14 @@ enum BIQUAD_TYPE
     BIQUAD_LOWPASS,
     BIQUAD_HIGHPASS,
     BIQUAD_BANDPASS,
-    BIQUAD_NOTCH,
-    BIQUAD_PEAK,
+    BIQUAD_NOTCH,    
+    BIQUAD_PEAKING,
     BIQUAD_LOW_SHELF,
     BIQUAD_HIGH_SHELF,
     BIQUAD_FORMANT,
-    BIQUAD_ALLPASS
+    BIQUAD_ALLPASS,
+    BIQUAD_UNITY, 
+    BIQUAD_MAX
 };
 
 Biquad *create_biquad();
@@ -40,7 +42,7 @@ void destroy_biquad(Biquad *biquad);
 void reset_biquad(Biquad *biquad);
 // a can be q, bw or slope
 // b can be gain or unused
-void set_biquad(Biquad *biquad, int type, float freq, float a, float b);
+void set_biquad(Biquad *biquad, int type, float freq, float sr, float a, float b);
 float process_biquad(Biquad *biquad, float sample);
 
 #define INIT_DELAY_MAX 256

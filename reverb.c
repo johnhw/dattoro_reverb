@@ -53,6 +53,110 @@ float process_biquad(Biquad *biquad, float x)
     biquad->y1 = y;
     return y;
 }
+// a can be q or shelf
+// b can be octaves or unused
+void set_biquad(Biquad *biquad, int type, float freq, float sr, float a, float b)
+{
+    float cw0, sw0, alpha;
+    float w0 = 2 * M_PI * (freq / sr);
+    float q = a;
+    float shelf = a;
+    float octaves = b;
+    cw0 = cos(w0);
+    sw0 = sin(w0);
+    alpha = sw0 / (2 * q);
+    float shelf_alpha = sw0 * sinh(M_LN2 / 2 * octaves * w0 / sw0);
+    float A = pow(10, shelf / 40.0);
+    float beta = sqrt(A) / octaves;
+
+    if (type < 0 || type >= BIQUAD_MAX)
+        return;
+
+    switch (type)
+    {
+    case BIQUAD_LOWPASS:
+        biquad->b0 = (1 - cw0) / 2;
+        biquad->b1 = 1 - cw0;
+        biquad->b2 = (1 - cw0) / 2;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_HIGHPASS:
+        biquad->b0 = (1 + cw0) / 2;
+        biquad->b1 = -(1 + cw0);
+        biquad->b2 = (1 + cw0) / 2;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_BANDPASS:
+        biquad->b0 = q * alpha;
+        biquad->b1 = 0;
+        biquad->b2 = -q * alpha;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_UNITY:
+        biquad->b0 = alpha;
+        biquad->b1 = 0;
+        biquad->b2 = -alpha;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_NOTCH:
+        biquad->b0 = 1;
+        biquad->b1 = -2 * cw0;
+        biquad->b2 = 1;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_ALLPASS:
+        biquad->b0 = 1 - alpha;
+        biquad->b1 = -2 * cw0;
+        biquad->b2 = 1 + alpha;
+        biquad->a0 = 1 + alpha;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - alpha;
+        break;
+    case BIQUAD_PEAKING:
+        biquad->a0 = 1 + shelf_alpha / A;
+        biquad->a1 = -2 * cw0;
+        biquad->a2 = 1 - shelf_alpha / A;
+        biquad->b0 = 1 + shelf_alpha * A;
+        biquad->b1 = -2 * cw0;
+        biquad->b2 = 1 - shelf_alpha * A;
+        break;
+    case BIQUAD_LOW_SHELF:
+        biquad->a0 = (A + 1) + (A - 1) * cw0 + beta * sw0;
+        biquad->a1 = -2 * ((A - 1) + (A + 1) * cw0);
+        biquad->a2 = (A + 1) + (A - 1) * cw0 - beta * sw0;
+        biquad->b0 = A * ((A + 1) - (A - 1) * cw0 + beta * sw0);
+        biquad->b1 = 2 * A * ((A - 1) - (A + 1) * cw0);
+        biquad->b2 = A * ((A + 1) - (A - 1) * cw0 - beta * sw0);
+        break;
+    case BIQUAD_HIGH_SHELF:
+        biquad->a0 = (A + 1) - (A - 1) * cw0 + beta * sw0;
+        biquad->a1 = 2 * ((A - 1) - (A + 1) * cw0);
+        biquad->a2 = (A + 1) - (A - 1) * cw0 - beta * sw0;
+        biquad->b0 = A * ((A + 1) + (A - 1) * cw0 + beta * sw0);
+        biquad->b1 = -2 * A * ((A - 1) + (A + 1) * cw0);
+        biquad->b2 = A * ((A + 1) + (A - 1) * cw0 - beta * sw0);
+        break;
+    case BIQUAD_FORMANT:
+        biquad->b0 = 1.0 - q;
+        biquad->b1 = 0.0;
+        biquad->b2 = -q * (1.0 - q);
+        biquad->a0 = 1.0;
+        biquad->a1 = -2 * q * cos((2 * M_PI * freq) / sr);
+        biquad->a2 = q * q;
+        break;
+    }
+}
+
 
 // Create a delay line with a given maximum length
 // Delay will start out with a delay equal to the maximum
