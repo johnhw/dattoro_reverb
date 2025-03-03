@@ -125,9 +125,9 @@ float delay_out(DelayLine *delay)
     an = delay->samples[aread];
     bn = delay->samples[bread];
 
-    if (!delay->modulated)
+    if (delay->read_fraction == 0.0 || delay->interpolation_mode == MODDELAY_INTERPOLATION_NONE)
         return an;
-
+        
     if (delay->interpolation_mode == MODDELAY_INTERPOLATION_LINEAR)
     {
         // read from write_head + delay line length + modulation factor
@@ -144,12 +144,13 @@ float delay_out(DelayLine *delay)
 }
 
 // Set the delay line length
-void set_delay(DelayLine *delay, int delay_length)
+void set_delay(DelayLine *delay, float length)
 {
     // expand the delay line if the new delay is longer than the current delay line
     // always need 2*delay_length samples
     // read head is centered on write_head + delay_length
-    if (delay_length * 2 >= delay->max_n_samples)
+    int delay_length = (int)length;
+    if (delay_length * 2 >= delay->max_n_samples-1)
     {
         int i, old_length;
         old_length = delay->max_n_samples;
@@ -163,6 +164,7 @@ void set_delay(DelayLine *delay, int delay_length)
         delay->read_offset = delay_length;
 
     delay->n_samples = delay_length * 2;
+    delay->read_fraction = length - delay_length;
 }
 
 // Set the default parameters for a Dattoro reverberator

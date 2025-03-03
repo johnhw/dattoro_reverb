@@ -17,8 +17,10 @@
 
 #define INIT_DELAY_MAX 256
 
-#define MODDELAY_INTERPOLATION_LINEAR 0
-#define MODDELAY_INTERPOLATION_ALLPASS 1
+#define MODDELAY_INTERPOLATION_NONE 0
+#define MODDELAY_INTERPOLATION_LINEAR 1
+#define MODDELAY_INTERPOLATION_ALLPASS 2
+
 
 typedef struct DelayLine
 {
@@ -51,7 +53,7 @@ void set_feedback_delay(DelayLine *delay, float feedback);
 void destroy_delay(DelayLine *delay);
 void delay_in(DelayLine *delay, float sample);
 float delay_out(DelayLine *delay);
-void set_delay(DelayLine *delay, int delay_length);
+void set_delay(DelayLine *delay, float length);
 float tap_delay(DelayLine *delay, int index);
 
 /** @struct DattoroReverb A reverb structure, consisting of a predelay delayline and
