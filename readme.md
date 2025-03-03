@@ -67,4 +67,8 @@ When no longer needed, the reverb instance should be freed to avoid memory leaks
 destroy_reverb(reverb);
 ```
 
+## Testing
 
+`gcc reverb.c reverb_test.c -o reverb`
+
+`./reverb test_file.wav` (must be stereo 16-bit PCM) will produce `test_file.wav_reverb.wav` with the default reverb applied.
