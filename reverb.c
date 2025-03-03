@@ -56,9 +56,9 @@ float process_biquad(Biquad *biquad, float x)
 
 // Create a delay line with a given maximum length
 // Delay will start out with a delay equal to the maximum
-ModDelayLine *create_delay()
+DelayLine *create_delay()
 {
-    ModDelayLine *delay = (ModDelayLine *)malloc(sizeof(*delay));
+    DelayLine *delay = (DelayLine *)malloc(sizeof(*delay));
 
     delay->max_n_samples = INIT_DELAY_MAX * 2;
     delay->n_samples = INIT_DELAY_MAX * 2;
@@ -81,7 +81,7 @@ ModDelayLine *create_delay()
 
 // set the frequency and extent of the modulation on this delay line
 // if modulation extent is 0, don't modulate
-void set_modulation_delay(ModDelayLine *delay, float modulation_extent, float modulation_frequency)
+void set_modulation_delay(DelayLine *delay, float modulation_extent, float modulation_frequency)
 {
 
     if (delay->modulation_extent >= delay->read_offset)
@@ -100,14 +100,14 @@ void set_modulation_delay(ModDelayLine *delay, float modulation_extent, float mo
 }
 
 // Destroy a delay line object
-void destroy_delay(ModDelayLine *delay)
+void destroy_delay(DelayLine *delay)
 {
     free(delay->samples);
     free(delay);
 }
 
 // Take a new sample into the delay line
-void delay_in(ModDelayLine *delay, float sample)
+void delay_in(DelayLine *delay, float sample)
 {
     double offset;
     delay->samples[delay->write_head++] = sample;
@@ -131,13 +131,13 @@ void delay_in(ModDelayLine *delay, float sample)
 }
 
 // set the interpolation mode (linear or allpass)
-void set_interpolation_mode_delay(ModDelayLine *delay, int mode)
+void set_interpolation_mode_delay(DelayLine *delay, int mode)
 {
     delay->interpolation_mode = mode;
 }
 
 // Get the sample at (write_head - index)
-float tap_delay(ModDelayLine *delay, int index)
+float tap_delay(DelayLine *delay, int index)
 {
     int rindex = delay->write_head - index;
     while (rindex < 0)
@@ -147,7 +147,7 @@ float tap_delay(ModDelayLine *delay, int index)
 
 // Return the current output of the delay line
 // Does not adjust the delay line state
-float delay_out(ModDelayLine *delay)
+float delay_out(DelayLine *delay)
 {
 
     int aread, bread;
@@ -183,7 +183,7 @@ float delay_out(ModDelayLine *delay)
 }
 
 // Set the delay line length
-void set_delay(ModDelayLine *delay, int delay_length)
+void set_delay(DelayLine *delay, int delay_length)
 {
     // expand the delay line if the new delay is longer than the current delay line
     // always need 2*delay_length samples
@@ -310,7 +310,7 @@ void destroy_reverb(DattoroReverb *reverb)
     free(reverb);
 }
 
-float apply_diffusion(ModDelayLine *delay, float x, float diffusion)
+float apply_diffusion(DelayLine *delay, float x, float diffusion)
 {
     float y = delay_out(delay);
     float z = x - y * diffusion;

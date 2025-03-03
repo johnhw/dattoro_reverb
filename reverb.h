@@ -48,7 +48,7 @@ float process_biquad(Biquad *biquad, float sample);
 #define MODDELAY_INTERPOLATION_LINEAR 0
 #define MODDELAY_INTERPOLATION_ALLPASS 1
 
-typedef struct ModDelayLine
+typedef struct DelayLine
 {
     float *samples;
     int n_samples;
@@ -69,18 +69,18 @@ typedef struct ModDelayLine
     int modulated;
     float allpass_a;
     int sample_rate;
-} ModDelayLine;
+} DelayLine;
 
-ModDelayLine *create_delay(void);
+DelayLine *create_delay(void);
 
-void set_interpolation_mode_delay(ModDelayLine *delay, int mode);
-void set_modulation_delay(ModDelayLine *delay, float modulation_extent, float modulation_frequency);
-void set_feedback_delay(ModDelayLine *delay, float feedback);
-void destroy_delay(ModDelayLine *delay);
-void delay_in(ModDelayLine *delay, float sample);
-float delay_out(ModDelayLine *delay);
-void set_delay(ModDelayLine *delay, int delay_length);
-float tap_delay(ModDelayLine *delay, int index);
+void set_interpolation_mode_delay(DelayLine *delay, int mode);
+void set_modulation_delay(DelayLine *delay, float modulation_extent, float modulation_frequency);
+void set_feedback_delay(DelayLine *delay, float feedback);
+void destroy_delay(DelayLine *delay);
+void delay_in(DelayLine *delay, float sample);
+float delay_out(DelayLine *delay);
+void set_delay(DelayLine *delay, int delay_length);
+float tap_delay(DelayLine *delay, int index);
 
 /** @struct DattoroReverb A reverb structure, consisting of a predelay delayline and
     twelve delaylines which form a Dattoro reverb network, two of
@@ -89,7 +89,7 @@ float tap_delay(ModDelayLine *delay, int index);
 typedef struct DattoroReverb
 {
 
-    ModDelayLine *pre_delay;
+    DelayLine *pre_delay;
     float bandwidth;
     float damping;
     float decay;
@@ -100,7 +100,7 @@ typedef struct DattoroReverb
 
     float max_excursion_1;
     float max_excursion_2;
-    ModDelayLine *delay_lines[12];
+    DelayLine *delay_lines[12];
 
     float pre_sample;
     float diffusion_sample_a;
