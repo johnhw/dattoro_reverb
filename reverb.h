@@ -45,6 +45,7 @@ float process_biquad(Biquad *biquad, float sample);
 
 #define INIT_DELAY_MAX 256
 
+
 #define MODDELAY_INTERPOLATION_LINEAR 0
 #define MODDELAY_INTERPOLATION_ALLPASS 1
 
