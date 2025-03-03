@@ -14,34 +14,6 @@
 #define __REVERB_H__
 #include <stdbool.h>
 
-typedef struct Biquad
-{
-    float a0, a1, a2, b0, b1, b2;
-    float x1, x2, y1, y2;
-    float feedback;
-    bool saturate;
-} Biquad;
-
-enum BIQUAD_TYPE
-{
-    BIQUAD_LOWPASS,
-    BIQUAD_HIGHPASS,
-    BIQUAD_BANDPASS,
-    BIQUAD_NOTCH,
-    BIQUAD_PEAK,
-    BIQUAD_LOW_SHELF,
-    BIQUAD_HIGH_SHELF,
-    BIQUAD_FORMANT,
-    BIQUAD_ALLPASS
-};
-
-Biquad *create_biquad();
-void destroy_biquad(Biquad *biquad);
-void reset_biquad(Biquad *biquad);
-// a can be q, bw or slope
-// b can be gain or unused
-void set_biquad(Biquad *biquad, int type, float freq, float a, float b);
-float process_biquad(Biquad *biquad, float sample);
 
 #define INIT_DELAY_MAX 256
 

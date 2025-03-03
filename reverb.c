@@ -15,45 +15,6 @@
 #include <string.h>
 #include <math.h>
 
-Biquad *create_biquad()
-{
-    Biquad *biquad = (Biquad *)malloc(sizeof(*biquad));
-    reset_biquad(biquad);
-    return biquad;
-}
-
-// Destroy a biquad object
-void destroy_biquad(Biquad *biquad)
-{
-    free(biquad);
-}
-
-// reset a biquad object (eliminate transients!)
-void reset_biquad(Biquad *biquad)
-{
-    biquad->x1 = 0;
-    biquad->x2 = 0;
-    biquad->y1 = 0;
-    biquad->y2 = 0;
-}
-
-// Pass a sample through a biquad filter
-float process_biquad(Biquad *biquad, float x)
-{
-    float y;
-    float feedback;
-    if (biquad->saturate)
-        feedback = tanh(biquad->feedback * biquad->y1);
-    else
-        feedback = biquad->feedback * biquad->y1;
-    y = (biquad->b0 * (x - feedback) + biquad->b1 * biquad->x1 + biquad->b2 * biquad->x2 - biquad->a1 * biquad->y1 - biquad->a2 * biquad->y2) / biquad->a0;
-    biquad->x2 = biquad->x1;
-    biquad->x1 = x;
-    biquad->y2 = biquad->y1;
-    biquad->y1 = y;
-    return y;
-}
-
 // Create a delay line with a given maximum length
 // Delay will start out with a delay equal to the maximum
 DelayLine *create_delay()
